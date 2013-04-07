@@ -20,12 +20,14 @@ package net.sourceforge.subsonic.domain;
 
 import java.util.Date;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
+
 /**
  * An icon representing a user.
  *
  * @author Sindre Mehus
  */
-public class Avatar {
+public class Avatar extends AbstractDataObject {
 
     private int id;
     private String name;
@@ -45,7 +47,7 @@ public class Avatar {
         this.data = data;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

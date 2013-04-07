@@ -41,23 +41,23 @@ public class Schema26 extends Schema{
         if (!tableExists(template, "music_folder")) {
             LOG.info("Database table 'music_folder' not found.  Creating it.");
             template.execute("create table music_folder (" +
-                             "id identity," +
+                             "id serial," +
                              "path varchar not null," +
                              "name varchar not null," +
                              "enabled boolean not null)");
-            template.execute("insert into music_folder values (null, '" + Util.getDefaultMusicFolder() + "', 'Music', true)");
+            template.execute("insert into music_folder(path, name, enabled) values ('" + Util.getDefaultMusicFolder() + "', 'Music', true)");
             LOG.info("Database table 'music_folder' was created successfully.");
         }
 
         if (!tableExists(template, "music_file_info")) {
             LOG.info("Database table 'music_file_info' not found.  Creating it.");
-            template.execute("create cached table music_file_info (" +
-                             "id identity," +
+            template.execute("create "+ (HSQL_DB == getDbType() ? "cached " :"") + "table music_file_info (" +
+                             "id serial," +
                              "path varchar not null," +
                              "rating int," +
                              "comment varchar," +
                              "play_count int," +
-                             "last_played datetime)");
+                             "last_played timestamp)");
             template.execute("create index idx_music_file_info_path on music_file_info(path)");
             LOG.info("Database table 'music_file_info' was created successfully.");
         }
@@ -65,7 +65,7 @@ public class Schema26 extends Schema{
         if (!tableExists(template, "internet_radio")) {
             LOG.info("Database table 'internet_radio' not found.  Creating it.");
             template.execute("create table internet_radio (" +
-                             "id identity," +
+                             "id serial," +
                              "name varchar not null," +
                              "stream_url varchar not null," +
                              "homepage_url varchar," +
@@ -82,7 +82,7 @@ public class Schema26 extends Schema{
                              "username varchar," +
                              "ip_address varchar," +
                              "auto_control_enabled boolean not null," +
-                             "last_seen datetime," +
+                             "last_seen timestamp," +
                              "cover_art_scheme varchar not null," +
                              "transcode_scheme varchar not null," +
                              "primary key (id))");
@@ -100,8 +100,8 @@ public class Schema26 extends Schema{
         if (template.queryForInt("select count(*) from role where id = 6") == 0) {
             LOG.info("Role 'comment' not found in database. Creating it.");
             template.execute("insert into role values (6, 'comment')");
-            template.execute("insert into user_role " +
-                             "select distinct u.username, 6 from user u, user_role ur " +
+            template.execute("insert into users_role " +
+                             "select distinct u.username, 6 from users u, users_role ur " +
                              "where u.username = ur.username and ur.role_id in (1, 5)");
             LOG.info("Role 'comment' was created successfully.");
         }

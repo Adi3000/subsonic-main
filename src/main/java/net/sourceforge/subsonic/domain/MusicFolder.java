@@ -22,13 +22,15 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
+
 /**
  * Represents a top level directory in which music or other media is stored.
  *
  * @author Sindre Mehus
  * @version $Revision: 1.1 $ $Date: 2005/11/27 14:32:05 $
  */
-public class MusicFolder implements Serializable {
+public class MusicFolder  extends AbstractDataObject implements Serializable {
 
     private Integer id;
     private File path;

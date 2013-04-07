@@ -52,30 +52,30 @@ public class Schema25 extends Schema{
             LOG.info("Database table 'role' was created successfully.");
         }
 
-        if (!tableExists(template, "user")) {
-            LOG.info("Database table 'user' not found.  Creating it.");
-            template.execute("create table user (" +
+        if (!tableExists(template, "users")) {
+            LOG.info("Database table 'users' not found.  Creating it.");
+            template.execute("create table users (" +
                              "username varchar not null," +
                              "password varchar not null," +
                              "primary key (username))");
-            template.execute("insert into user values ('admin', 'admin')");
-            LOG.info("Database table 'user' was created successfully.");
+            template.execute("insert into users values ('admin', 'admin')");
+            LOG.info("Database table 'users' was created successfully.");
         }
 
-        if (!tableExists(template, "user_role")) {
-            LOG.info("Database table 'user_role' not found.  Creating it.");
-            template.execute("create table user_role (" +
+        if (!tableExists(template, "users_role")) {
+            LOG.info("Database table 'users_role' not found.  Creating it.");
+            template.execute("create table users_role (" +
                              "username varchar not null," +
                              "role_id int not null," +
                              "primary key (username, role_id)," +
-                             "foreign key (username) references user(username)," +
+                             "foreign key (username) references users(username)," +
                              "foreign key (role_id) references role(id))");
-            template.execute("insert into user_role values ('admin', 1)");
-            template.execute("insert into user_role values ('admin', 2)");
-            template.execute("insert into user_role values ('admin', 3)");
-            template.execute("insert into user_role values ('admin', 4)");
-            template.execute("insert into user_role values ('admin', 5)");
-            LOG.info("Database table 'user_role' was created successfully.");
+            template.execute("insert into users_role values ('admin', 1)");
+            template.execute("insert into users_role values ('admin', 2)");
+            template.execute("insert into users_role values ('admin', 3)");
+            template.execute("insert into users_role values ('admin', 4)");
+            template.execute("insert into users_role values ('admin', 5)");
+            LOG.info("Database table 'users_role' was created successfully.");
         }
     }
 }

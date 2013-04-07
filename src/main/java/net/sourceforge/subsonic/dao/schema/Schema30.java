@@ -38,19 +38,19 @@ public class Schema30 extends Schema {
             template.execute("insert into version values (6)");
         }
 
-        if (!columnExists(template, "last_fm_enabled", "user_settings")) {
-            LOG.info("Database columns 'user_settings.last_fm_*' not found.  Creating them.");
-            template.execute("alter table user_settings add last_fm_enabled boolean default false not null");
-            template.execute("alter table user_settings add last_fm_username varchar null");
-            template.execute("alter table user_settings add last_fm_password varchar null");
-            LOG.info("Database columns 'user_settings.last_fm_*' were added successfully.");
+        if (!columnExists(template, "last_fm_enabled", "users_settings")) {
+            LOG.info("Database columns 'users_settings.last_fm_*' not found.  Creating them.");
+            template.execute("alter table users_settings add last_fm_enabled boolean default false not null");
+            template.execute("alter table users_settings add last_fm_username varchar null");
+            template.execute("alter table users_settings add last_fm_password varchar null");
+            LOG.info("Database columns 'users_settings.last_fm_*' were added successfully.");
         }
 
-        if (!columnExists(template, "transcode_scheme", "user_settings")) {
-            LOG.info("Database column 'user_settings.transcode_scheme' not found.  Creating it.");
-            template.execute("alter table user_settings add transcode_scheme varchar default '" +
+        if (!columnExists(template, "transcode_scheme", "users_settings")) {
+            LOG.info("Database column 'users_settings.transcode_scheme' not found.  Creating it.");
+            template.execute("alter table users_settings add transcode_scheme varchar default '" +
                              TranscodeScheme.OFF.name() + "' not null");
-            LOG.info("Database column 'user_settings.transcode_scheme' was added successfully.");
+            LOG.info("Database column 'users_settings.transcode_scheme' was added successfully.");
         }
     }
 }

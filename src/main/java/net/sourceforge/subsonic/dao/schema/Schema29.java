@@ -37,19 +37,19 @@ public class Schema29 extends Schema {
             template.execute("insert into version values (5)");
         }
 
-        if (!tableExists(template, "user_rating")) {
-            LOG.info("Database table 'user_rating' not found.  Creating it.");
-            template.execute("create table user_rating (" +
+        if (!tableExists(template, "users_rating")) {
+            LOG.info("Database table 'users_rating' not found.  Creating it.");
+            template.execute("create table users_rating (" +
                              "username varchar not null," +
                              "path varchar not null," +
-                             "rating double not null," +
+                             "rating decimal not null," +
                              "primary key (username, path)," +
-                             "foreign key (username) references user(username) on delete cascade)");
-            LOG.info("Database table 'user_rating' was created successfully.");
+                             "foreign key (username) references users(username) on delete cascade)");
+            LOG.info("Database table 'users_rating' was created successfully.");
 
-            template.execute("insert into user_rating select 'admin', path, rating from music_file_info " +
+            template.execute("insert into users_rating select 'admin', path, rating from music_file_info " +
                              "where rating is not null and rating > 0");
-            LOG.info("Migrated data from 'music_file_info' to 'user_rating'.");
+            LOG.info("Migrated data from 'music_file_info' to 'users_rating'.");
         }
     }
 }

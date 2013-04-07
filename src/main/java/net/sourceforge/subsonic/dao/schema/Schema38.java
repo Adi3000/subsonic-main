@@ -45,10 +45,10 @@ public class Schema38 extends Schema {
             LOG.info("Database column 'player.client_id' was added successfully.");
         }
 
-        if (!columnExists(template, "show_chat", "user_settings")) {
-            LOG.info("Database column 'user_settings.show_chat' not found.  Creating it.");
-            template.execute("alter table user_settings add show_chat boolean default true not null");
-            LOG.info("Database column 'user_settings.show_chat' was added successfully.");
+        if (!columnExists(template, "show_chat", "users_settings")) {
+            LOG.info("Database column 'users_settings.show_chat' not found.  Creating it.");
+            template.execute("alter table users_settings add show_chat boolean default true not null");
+            LOG.info("Database column 'users_settings.show_chat' was added successfully.");
         }
     }
 }

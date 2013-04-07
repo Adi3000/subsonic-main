@@ -39,7 +39,7 @@ public class Schema40 extends Schema {
             template.execute("insert into version values (15)");
 
             // Reset stream byte count since they have been wrong in earlier releases.
-            template.execute("update user set bytes_streamed = 0");
+            template.execute("update users set bytes_streamed = 0");
             LOG.info("Reset stream byte count statistics.");
         }
     }

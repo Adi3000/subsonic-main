@@ -36,8 +36,9 @@ import java.util.List;
 public class AlbumDao extends AbstractDao {
 
     private static final Logger LOG = Logger.getLogger(AlbumDao.class);
-    private static final String COLUMNS = "id, name, artist, song_count, duration_seconds, cover_art_path, " +
-            "play_count, last_played, comment, created, last_scanned, present";
+    private static final String COLUMNS_FOR_INSERT = "name, artist, song_count, duration_seconds, cover_art_path, " +
+    		"play_count, last_played, comment, created, last_scanned, present";
+    private static final String COLUMNS = "id, "+ COLUMNS_FOR_INSERT;
 
     private final RowMapper rowMapper = new AlbumMapper();
 
@@ -82,8 +83,7 @@ public class AlbumDao extends AbstractDao {
                 album.getComment(), album.getCreated(), album.getLastScanned(), album.isPresent(), album.getArtist(), album.getName());
 
         if (n == 0) {
-
-            update("insert into album (" + COLUMNS + ") values (" + questionMarks(COLUMNS) + ")", null, album.getName(), album.getArtist(),
+            update("insert into album (" + COLUMNS_FOR_INSERT + ") values (" + questionMarks(COLUMNS_FOR_INSERT) + ")", album.getName(), album.getArtist(),
                     album.getSongCount(), album.getDurationSeconds(), album.getCoverArtPath(), album.getPlayCount(), album.getLastPlayed(),
                     album.getComment(), album.getCreated(), album.getLastScanned(), album.isPresent());
         }

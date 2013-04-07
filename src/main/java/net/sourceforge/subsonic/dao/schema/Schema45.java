@@ -42,33 +42,35 @@ public class Schema45 extends Schema {
         if (template.queryForInt("select count(*) from role where id = 11") == 0) {
             LOG.info("Role 'share' not found in database. Creating it.");
             template.execute("insert into role values (11, 'share')");
-            template.execute("insert into user_role " +
-                             "select distinct u.username, 11 from user u, user_role ur " +
+            template.execute("insert into users_role " +
+                             "select distinct u.username, 11 from users u, users_role ur " +
                              "where u.username = ur.username and ur.role_id = 1");
             LOG.info("Role 'share' was created successfully.");
         }
 
         if (!tableExists(template, "share")) {
             LOG.info("Table 'share' not found in database. Creating it.");
-            template.execute("create cached table share (" +
-                    "id identity," +
+            template.execute("create "+ (HSQL_DB == getDbType() ? "cached " :"") + "table share (" +
+                    "id serial," +
                     "name varchar not null," +
                     "description varchar," +
                     "username varchar not null," +
-                    "created datetime not null," +
-                    "expires datetime," +
-                    "last_visited datetime," +
+                    "created timestamp not null," +
+                    "expires timestamp," +
+                    "last_visited timestamp," +
                     "visit_count int default 0 not null," +
                     "unique (name)," +
-                    "foreign key (username) references user(username) on delete cascade)");
+                    "primary key (id)," +
+                    "foreign key (username) references users(username) on delete cascade)");
             template.execute("create index idx_share_name on share(name)");
 
             LOG.info("Table 'share' was created successfully.");
             LOG.info("Table 'share_file' not found in database. Creating it.");
-            template.execute("create cached table share_file (" +
-                    "id identity," +
+            template.execute("create "+ (HSQL_DB == getDbType() ? "cached " :"") + "table share_file (" +
+                    "id serial," +
                     "share_id int not null," +
                     "path varchar not null," +
+                    "primary key (id)," +
                     "foreign key (share_id) references share(id) on delete cascade)");
             LOG.info("Table 'share_file' was created successfully.");
         }

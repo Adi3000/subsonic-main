@@ -18,6 +18,8 @@
  */
 package net.sourceforge.subsonic.domain;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -28,9 +30,9 @@ import java.util.Date;
  *
  * @author Sindre Mehus
  */
-public class Player {
+public class Player extends AbstractDataObject{
 
-    private String id;
+    private Integer id;
     private String name;
     private PlayerTechnology technology = PlayerTechnology.WEB;
     private String clientId;
@@ -49,7 +51,7 @@ public class Player {
      *
      * @return The player ID.
      */
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -58,7 +60,7 @@ public class Player {
      *
      * @param id The player ID.
      */
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

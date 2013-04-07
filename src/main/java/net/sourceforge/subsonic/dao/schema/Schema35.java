@@ -60,35 +60,49 @@ public class Schema35 extends Schema {
             template.execute("insert into version values (11)");
         }
 
-        if (!columnExists(template, "now_playing_allowed", "user_settings")) {
-            LOG.info("Database column 'user_settings.now_playing_allowed' not found.  Creating it.");
-            template.execute("alter table user_settings add now_playing_allowed boolean default true not null");
-            LOG.info("Database column 'user_settings.now_playing_allowed' was added successfully.");
+        if (!columnExists(template, "now_playing_allowed", "users_settings")) {
+            LOG.info("Database column 'users_settings.now_playing_allowed' not found.  Creating it.");
+            template.execute("alter table users_settings add now_playing_allowed boolean default true not null");
+            LOG.info("Database column 'users_settings.now_playing_allowed' was added successfully.");
         }
 
-        if (!columnExists(template, "web_player_default", "user_settings")) {
-            LOG.info("Database column 'user_settings.web_player_default' not found.  Creating it.");
-            template.execute("alter table user_settings add web_player_default boolean default false not null");
-            LOG.info("Database column 'user_settings.web_player_default' was added successfully.");
+        if (!columnExists(template, "web_player_default", "users_settings")) {
+            LOG.info("Database column 'users_settings.web_player_default' not found.  Creating it.");
+            template.execute("alter table users_settings add web_player_default boolean default false not null");
+            LOG.info("Database column 'users_settings.web_player_default' was added successfully.");
         }
 
         if (template.queryForInt("select count(*) from role where id = 8") == 0) {
             LOG.info("Role 'stream' not found in database. Creating it.");
             template.execute("insert into role values (8, 'stream')");
-            template.execute("insert into user_role select distinct u.username, 8 from user u");
+            template.execute("insert into users_role select distinct u.username, 8 from users u");
             LOG.info("Role 'stream' was created successfully.");
         }
 
         if (!tableExists(template, "system_avatar")) {
             LOG.info("Database table 'system_avatar' not found.  Creating it.");
-            template.execute("create table system_avatar (" +
-                             "id identity," +
-                             "name varchar," +
-                             "created_date datetime not null," +
-                             "mime_type varchar not null," +
-                             "width int not null," +
-                             "height int not null," +
-                             "data binary not null)");
+            //TODO implement that
+            String query = "create table system_avatar (" +
+                    "id serial," +
+                    "name varchar," +
+                    "created_date timestamp not null," +
+                    "mime_type varchar not null," +
+                    "width int not null," +
+                    "height int not null," +
+                    "data binary not null)"; 
+            		
+            if(PSQL_DB == this.getDbType()){
+	            query = "create table system_avatar (" +
+	                             "id serial," +
+	                             "name varchar," +
+	                             "created_date timestamp not null," +
+	                             "mime_type varchar not null," +
+	                             "width int not null," +
+	                             "height int not null," +
+	                             "data bytea not null," +
+	                             "primary key (id))";
+            }
+            template.execute(query);
             LOG.info("Database table 'system_avatar' was created successfully.");
         }
 
@@ -98,30 +112,44 @@ public class Schema35 extends Schema {
 
         if (!tableExists(template, "custom_avatar")) {
             LOG.info("Database table 'custom_avatar' not found.  Creating it.");
-            template.execute("create table custom_avatar (" +
-                             "id identity," +
-                             "name varchar," +
-                             "created_date datetime not null," +
-                             "mime_type varchar not null," +
-                             "width int not null," +
-                             "height int not null," +
-                             "data binary not null," +
-                             "username varchar not null," +
-                             "foreign key (username) references user(username) on delete cascade)");
+            String query = "create table custom_avatar (" +
+                    "id serial," +
+                    "name varchar," +
+                    "created_date timestamp not null," +
+                    "mime_type varchar not null," +
+                    "width int not null," +
+                    "height int not null," +
+                    "data binary not null," +
+                    "username varchar not null," +
+                    "primary key (id)," +
+                    "foreign key (username) references users(username) on delete cascade)";
+            if(PSQL_DB == this.getDbType()){
+            	query = "create table custom_avatar (" +
+                        "id serial," +
+                        "name varchar," +
+                        "created_date timestamp not null," +
+                        "mime_type varchar not null," +
+                        "width int not null," +
+                        "height int not null," +
+                        "data bytea not null," +
+                        "username varchar not null," +
+                        "foreign key (username) references users(username) on delete cascade)";
+            }
+            template.execute(query);
             LOG.info("Database table 'custom_avatar' was created successfully.");
         }
 
-        if (!columnExists(template, "avatar_scheme", "user_settings")) {
-            LOG.info("Database column 'user_settings.avatar_scheme' not found.  Creating it.");
-            template.execute("alter table user_settings add avatar_scheme varchar default 'NONE' not null");
-            LOG.info("Database column 'user_settings.avatar_scheme' was added successfully.");
+        if (!columnExists(template, "avatar_scheme", "users_settings")) {
+            LOG.info("Database column 'users_settings.avatar_scheme' not found.  Creating it.");
+            template.execute("alter table users_settings add avatar_scheme varchar default 'NONE' not null");
+            LOG.info("Database column 'users_settings.avatar_scheme' was added successfully.");
         }
 
-        if (!columnExists(template, "system_avatar_id", "user_settings")) {
-            LOG.info("Database column 'user_settings.system_avatar_id' not found.  Creating it.");
-            template.execute("alter table user_settings add system_avatar_id int");
-            template.execute("alter table user_settings add foreign key (system_avatar_id) references system_avatar(id)");
-            LOG.info("Database column 'user_settings.system_avatar_id' was added successfully.");
+        if (!columnExists(template, "system_avatar_id", "users_settings")) {
+            LOG.info("Database column 'users_settings.system_avatar_id' not found.  Creating it.");
+            template.execute("alter table users_settings add system_avatar_id int");
+            template.execute("alter table users_settings add foreign key (system_avatar_id) references system_avatar(id)");
+            LOG.info("Database column 'users_settings.system_avatar_id' was added successfully.");
         }
 
         if (!columnExists(template, "jukebox", "player")) {
@@ -138,7 +166,7 @@ public class Schema35 extends Schema {
             try {
                 in = getClass().getResourceAsStream(avatar + ".png");
                 byte[] imageData = IOUtils.toByteArray(in);
-                template.update("insert into system_avatar values (null, ?, ?, ?, ?, ?, ?)",
+                template.update("insert into system_avatar(name,created_date, mime_type, width, height, data) values (?, ?, ?, ?, ?, ?)",
                                 new Object[]{avatar, new Date(), "image/png", 48, 48, imageData});
                 LOG.info("Created avatar '" + avatar + "'.");
             } catch (IOException x) {

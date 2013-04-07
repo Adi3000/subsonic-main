@@ -32,7 +32,8 @@ import java.util.List;
  */
 public class AvatarDao extends AbstractDao {
 
-    private static final String COLUMNS = "id, name, created_date, mime_type, width, height, data";
+    private static final String COLUMNS_FOR_INSERT = "name, created_date, mime_type, width, height, data";
+    private static final String COLUMNS = "id, "+COLUMNS_FOR_INSERT;
     private final AvatarRowMapper rowMapper = new AvatarRowMapper();
 
     /**
@@ -78,8 +79,8 @@ public class AvatarDao extends AbstractDao {
         update(sql, username);
 
         if (avatar != null) {
-            update("insert into custom_avatar(" + COLUMNS + ", username) values(" + questionMarks(COLUMNS) + ", ?)",
-                   null, avatar.getName(), avatar.getCreatedDate(), avatar.getMimeType(),
+            update("insert into custom_avatar(" + COLUMNS_FOR_INSERT + ", username) values(" + questionMarks(COLUMNS_FOR_INSERT) + ", ?)",
+                   avatar.getName(), avatar.getCreatedDate(), avatar.getMimeType(),
                    avatar.getWidth(), avatar.getHeight(), avatar.getData(), username);
         }
     }

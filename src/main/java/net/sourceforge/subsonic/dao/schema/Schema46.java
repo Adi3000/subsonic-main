@@ -43,19 +43,20 @@ public class Schema46 extends Schema {
         if (!tableExists(template, "transcoding2")) {
             LOG.info("Database table 'transcoding2' not found.  Creating it.");
             template.execute("create table transcoding2 (" +
-                             "id identity," +
+                             "id serial," +
                              "name varchar not null," +
                              "source_formats varchar not null," +
                              "target_format varchar not null," +
                              "step1 varchar not null," +
                              "step2 varchar," +
-                             "step3 varchar)");
+                             "step3 varchar," +
+                             "primary key (id))");
 
-            template.execute("insert into transcoding2 values(null,'mp3 audio'," +
+            template.execute("insert into transcoding2(name,source_formats,target_format,step1, step2 , step3 ) values('mp3 audio'," +
                     "'ogg oga aac m4a flac wav wma aif aiff ape mpc shn', 'mp3', " +
                     "'ffmpeg -i %s -ab %bk -v 0 -f mp3 -', null, null)");
 
-            template.execute("insert into transcoding2 values(null,'flv/h264 video', " +
+            template.execute("insert into transcoding2(name,source_formats,target_format,step1, step2 , step3 ) values('flv/h264 video', " +
                     "'avi mpg mpeg mp4 m4v mkv mov wmv ogv divx m2ts', 'flv', " +
                     "'ffmpeg -ss %o -i %s -async 1 -b %bk -s %wx%h -ar 44100 -ac 2 -v 0 -f flv -vcodec libx264 -preset superfast -threads 0 -', null, null)");
 

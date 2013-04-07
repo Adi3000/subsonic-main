@@ -41,8 +41,8 @@ public class Schema47 extends Schema {
 
         if (!tableExists(template, "media_file")) {
             LOG.info("Database table 'media_file' not found.  Creating it.");
-            template.execute("create cached table media_file (" +
-                    "id identity," +
+            template.execute("create "+ (HSQL_DB == getDbType() ? "cached " :"") + "table media_file (" +
+                    "id serial," +
                     "path varchar not null," +
                     "folder varchar," +
                     "type varchar not null," +
@@ -63,15 +63,16 @@ public class Schema47 extends Schema {
                     "cover_art_path varchar," +
                     "parent_path varchar not null," +
                     "play_count int not null," +
-                    "last_played datetime," +
+                    "last_played timestamp," +
                     "comment varchar," +
-                    "created datetime not null," +
-                    "last_modified datetime not null," +
-                    "last_scanned datetime not null," +
-                    "children_last_updated datetime not null," +
+                    "created timestamp not null," +
+                    "last_modified timestamp not null," +
+                    "last_scanned timestamp not null," +
+                    "children_last_updated timestamp not null," +
                     "present boolean not null," +
                     "version int not null," +
-                    "unique (path))");
+                    "unique (path)," +
+                    "primary key (id))");
 
             template.execute("create index idx_media_file_path on media_file(path)");
             template.execute("create index idx_media_file_parent_path on media_file(parent_path)");
@@ -89,14 +90,15 @@ public class Schema47 extends Schema {
 
         if (!tableExists(template, "artist")) {
             LOG.info("Database table 'artist' not found.  Creating it.");
-            template.execute("create cached table artist (" +
-                    "id identity," +
+            template.execute("create "+ (HSQL_DB == getDbType() ? "cached " :"") + "table artist (" +
+                    "id serial," +
                     "name varchar not null," +
                     "cover_art_path varchar," +
                     "album_count int default 0 not null," +
-                    "last_scanned datetime not null," +
+                    "last_scanned timestamp not null," +
                     "present boolean not null," +
-                    "unique (name))");
+                    "unique (name)," +
+                    "primary key(id))");
 
             template.execute("create index idx_artist_name on artist(name)");
             template.execute("create index idx_artist_present on artist(present)");
@@ -106,20 +108,21 @@ public class Schema47 extends Schema {
 
         if (!tableExists(template, "album")) {
             LOG.info("Database table 'album' not found.  Creating it.");
-            template.execute("create cached table album (" +
-                    "id identity," +
+            template.execute("create "+ (HSQL_DB == getDbType() ? "cached " :"") + "table album (" +
+                    "id serial," +
                     "name varchar not null," +
                     "artist varchar not null," +
                     "song_count int default 0 not null," +
                     "duration_seconds int default 0 not null," +
                     "cover_art_path varchar," +
                     "play_count int default 0 not null," +
-                    "last_played datetime," +
+                    "last_played timestamp," +
                     "comment varchar," +
-                    "created datetime not null," +
-                    "last_scanned datetime not null," +
+                    "created timestamp not null," +
+                    "last_scanned timestamp not null," +
                     "present boolean not null," +
-                    "unique (artist, name))");
+                    "unique (artist, name)," +
+                    "primary key (id))");
 
             template.execute("create index idx_album_artist_name on album(artist, name)");
             template.execute("create index idx_album_play_count on album(play_count)");
@@ -132,13 +135,14 @@ public class Schema47 extends Schema {
         if (!tableExists(template, "starred_media_file")) {
             LOG.info("Database table 'starred_media_file' not found.  Creating it.");
             template.execute("create table starred_media_file (" +
-                    "id identity," +
+                    "id serial," +
                     "media_file_id int not null," +
                     "username varchar not null," +
-                    "created datetime not null," +
+                    "created timestamp not null," +
                     "foreign key (media_file_id) references media_file(id) on delete cascade,"+
-                    "foreign key (username) references user(username) on delete cascade," +
-                    "unique (media_file_id, username))");
+                    "foreign key (username) references users(username) on delete cascade," +
+                    "unique (media_file_id, username)," +
+                    "primary key (id))");
 
             template.execute("create index idx_starred_media_file_media_file_id on starred_media_file(media_file_id)");
             template.execute("create index idx_starred_media_file_username on starred_media_file(username)");
@@ -149,13 +153,14 @@ public class Schema47 extends Schema {
         if (!tableExists(template, "starred_album")) {
             LOG.info("Database table 'starred_album' not found.  Creating it.");
             template.execute("create table starred_album (" +
-                    "id identity," +
+                    "id serial," +
                     "album_id int not null," +
                     "username varchar not null," +
-                    "created datetime not null," +
+                    "created timestamp not null," +
                     "foreign key (album_id) references album(id) on delete cascade," +
-                    "foreign key (username) references user(username) on delete cascade," +
-                    "unique (album_id, username))");
+                    "foreign key (username) references users(username) on delete cascade," +
+                    "unique (album_id, username)," +
+                    "primary key (id))");
 
             template.execute("create index idx_starred_album_album_id on starred_album(album_id)");
             template.execute("create index idx_starred_album_username on starred_album(username)");
@@ -166,13 +171,14 @@ public class Schema47 extends Schema {
         if (!tableExists(template, "starred_artist")) {
             LOG.info("Database table 'starred_artist' not found.  Creating it.");
             template.execute("create table starred_artist (" +
-                    "id identity," +
+                    "id serial," +
                     "artist_id int not null," +
                     "username varchar not null," +
-                    "created datetime not null," +
+                    "created timestamp not null," +
                     "foreign key (artist_id) references artist(id) on delete cascade,"+
-                    "foreign key (username) references user(username) on delete cascade," +
-                    "unique (artist_id, username))");
+                    "foreign key (username) references users(username) on delete cascade," +
+                    "unique (artist_id, username)," +
+                    "primary key (id))");
 
             template.execute("create index idx_starred_artist_artist_id on starred_artist(artist_id)");
             template.execute("create index idx_starred_artist_username on starred_artist(username)");

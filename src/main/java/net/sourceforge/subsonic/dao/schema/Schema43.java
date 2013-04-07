@@ -49,15 +49,15 @@ public class Schema43 extends Schema {
 
             for (String format : Arrays.asList("avi", "mpg", "mpeg", "mp4", "m4v", "mkv", "mov", "wmv", "ogv")) {
                 template.update("delete from transcoding where source_format=? and target_format=?", new Object[] {format, "flv"});
-                template.execute("insert into transcoding values(null,'" + format + " > flv' ,'" + format + "' ,'flv','ffmpeg -ss %o -i %s -async 1 -b %bk -s %wx%h -ar 44100 -ac 2 -v 0 -f flv -',null,null,true,true)");
+                template.execute("insert into transcoding (name, source_format, target_format, step1, step2, step3, enabled, default_active)  values('" + format + " > flv' ,'" + format + "' ,'flv','ffmpeg -ss %o -i %s -async 1 -b %bk -s %wx%h -ar 44100 -ac 2 -v 0 -f flv -',null,null,true,true)");
                 template.execute("insert into player_transcoding select p.id as player_id, t.id as transaction_id from player p, transcoding t where t.name = '" + format + " > flv'");
             }
             LOG.info("Created video transcoding configuration.");
         }
 
-        if (!columnExists(template, "email", "user")) {
+        if (!columnExists(template, "email", "users")) {
             LOG.info("Database column 'user.email' not found.  Creating it.");
-            template.execute("alter table user add email varchar");
+            template.execute("alter table users add email varchar");
             LOG.info("Database column 'user.email' was added successfully.");
         }
 

@@ -18,6 +18,7 @@
  */
 package net.sourceforge.subsonic.domain;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
 import net.sourceforge.subsonic.util.StringUtil;
 
 /**
@@ -29,7 +30,7 @@ import net.sourceforge.subsonic.util.StringUtil;
  *
  * @author Sindre Mehus
  */
-public class Transcoding {
+public class Transcoding extends AbstractDataObject {
 
     private Integer id;
     private String name;

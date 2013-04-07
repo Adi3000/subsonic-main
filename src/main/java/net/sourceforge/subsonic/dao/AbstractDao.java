@@ -124,4 +124,12 @@ public class AbstractDao {
     public void setDaoHelper(DaoHelper daoHelper) {
         this.daoHelper = daoHelper;
     }
+    
+    public String getColumnForInsertByDO(AbstractDataObject dataObject, String listWithId, String listWithoutId){
+    	if(dataObject.getId() == null){
+    		return listWithoutId;
+    	}else{
+    		return listWithId;
+    	}
+    }
 }

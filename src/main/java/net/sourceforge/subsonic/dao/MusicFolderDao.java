@@ -36,7 +36,8 @@ import net.sourceforge.subsonic.domain.MusicFolder;
 public class MusicFolderDao extends AbstractDao {
 
     private static final Logger LOG = Logger.getLogger(MusicFolderDao.class);
-    private static final String COLUMNS = "id, path, name, enabled, changed";
+    private static final String COLUMNS_FOR_INSERT = "path, name, enabled, changed";
+    private static final String COLUMNS = "id, "+COLUMNS_FOR_INSERT;
     private final MusicFolderRowMapper rowMapper = new MusicFolderRowMapper();
 
     /**
@@ -55,7 +56,7 @@ public class MusicFolderDao extends AbstractDao {
      * @param musicFolder The music folder to create.
      */
     public void createMusicFolder(MusicFolder musicFolder) {
-        String sql = "insert into music_folder (" + COLUMNS + ") values (null, ?, ?, ?, ?)";
+        String sql = "insert into music_folder (" + COLUMNS_FOR_INSERT + ") values (" + questionMarks(COLUMNS_FOR_INSERT) + ")";
         update(sql, musicFolder.getPath(), musicFolder.getName(), musicFolder.isEnabled(), musicFolder.getChanged());
         LOG.info("Created music folder " + musicFolder.getPath());
     }

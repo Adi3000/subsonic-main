@@ -38,16 +38,16 @@ public class Schema34 extends Schema {
             template.execute("insert into version values (10)");
         }
 
-        if (!columnExists(template, "ldap_authenticated", "user")) {
-            LOG.info("Database column 'user.ldap_authenticated' not found.  Creating it.");
-            template.execute("alter table user add ldap_authenticated boolean default false not null");
-            LOG.info("Database column 'user.ldap_authenticated' was added successfully.");
+        if (!columnExists(template, "ldap_authenticated", "users")) {
+            LOG.info("Database column 'users.ldap_authenticated' not found.  Creating it.");
+            template.execute("alter table users add ldap_authenticated boolean default false not null");
+            LOG.info("Database column 'users.ldap_authenticated' was added successfully.");
         }
 
-        if (!columnExists(template, "party_mode_enabled", "user_settings")) {
-            LOG.info("Database column 'user_settings.party_mode_enabled' not found.  Creating it.");
-            template.execute("alter table user_settings add party_mode_enabled boolean default false not null");
-            LOG.info("Database column 'user_settings.party_mode_enabled' was added successfully.");
+        if (!columnExists(template, "party_mode_enabled", "users_settings")) {
+            LOG.info("Database column 'users_settings.party_mode_enabled' not found.  Creating it.");
+            template.execute("alter table users_settings add party_mode_enabled boolean default false not null");
+            LOG.info("Database column 'users_settings.party_mode_enabled' was added successfully.");
         }
     }
 }

@@ -42,8 +42,8 @@ public class RatingDao extends AbstractDao {
         if (count < 1) {
             return new ArrayList<String>();
         }
-        String sql = "select path from user_rating " +
-                "where exists (select 1 from media_file where user_rating.path = media_file.path and present) " +
+        String sql = "select path from users_rating " +
+                "where exists (select 1 from media_file where users_rating.path = media_file.path and present) " +
                 "group by path " +
                 "order by avg(rating) desc " +
                 " limit " + count + " offset " + offset;
@@ -62,9 +62,9 @@ public class RatingDao extends AbstractDao {
             return;
         }
 
-        update("delete from user_rating where username=? and path=?", username, mediaFile.getPath());
+        update("delete from users_rating where username=? and path=?", username, mediaFile.getPath());
         if (rating != null) {
-            update("insert into user_rating values(?, ?, ?)", username, mediaFile.getPath(), rating);
+            update("insert into users_rating values(?, ?, ?)", username, mediaFile.getPath(), rating);
         }
     }
 
@@ -76,7 +76,7 @@ public class RatingDao extends AbstractDao {
      */
     public Double getAverageRating(MediaFile mediaFile) {
         try {
-            return (Double) getJdbcTemplate().queryForObject("select avg(rating) from user_rating where path=?", new Object[]{mediaFile.getPath()}, Double.class);
+            return (Double) getJdbcTemplate().queryForObject("select avg(rating) from users_rating where path=?", new Object[]{mediaFile.getPath()}, Double.class);
         } catch (EmptyResultDataAccessException x) {
             return null;
         }
@@ -91,7 +91,7 @@ public class RatingDao extends AbstractDao {
      */
     public Integer getRatingForUser(String username, MediaFile mediaFile) {
         try {
-            return getJdbcTemplate().queryForInt("select rating from user_rating where username=? and path=?", new Object[]{username, mediaFile.getPath()});
+            return getJdbcTemplate().queryForInt("select rating from users_rating where username=? and path=?", new Object[]{username, mediaFile.getPath()});
         } catch (EmptyResultDataAccessException x) {
             return null;
         }

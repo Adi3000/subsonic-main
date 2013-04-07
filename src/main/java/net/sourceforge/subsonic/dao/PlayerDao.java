@@ -43,11 +43,11 @@ import net.sourceforge.subsonic.domain.TranscodeScheme;
 public class PlayerDao extends AbstractDao {
 
     private static final Logger LOG = Logger.getLogger(PlayerDao.class);
-    private static final String COLUMNS = "id, name, type, username, ip_address, auto_control_enabled, " +
+    private static final String COLUMNS_FOR_INSERT = "name, type, username, ip_address, auto_control_enabled, " +
             "last_seen, cover_art_scheme, transcode_scheme, dynamic_ip, technology, client_id";
-
+    private static final String COLUMNS = "id, "+COLUMNS_FOR_INSERT;
     private PlayerRowMapper rowMapper = new PlayerRowMapper();
-    private Map<String, Playlist> playlists = Collections.synchronizedMap(new HashMap<String, Playlist>());
+    private Map<Integer, Playlist> playlists = Collections.synchronizedMap(new HashMap<Integer, Playlist>());
 
     /**
      * Returns all players.
@@ -83,7 +83,7 @@ public class PlayerDao extends AbstractDao {
      * @param id The unique player ID.
      * @return The player with the given ID, or <code>null</code> if no such player exists.
      */
-    public Player getPlayerById(String id) {
+    public Player getPlayerById(Integer id) {
         String sql = "select " + COLUMNS + " from player where id=?";
         return queryOne(sql, rowMapper, id);
     }
@@ -95,7 +95,7 @@ public class PlayerDao extends AbstractDao {
      */
     public synchronized void createPlayer(Player player) {
         int id = getJdbcTemplate().queryForInt("select max(id) from player") + 1;
-        player.setId(String.valueOf(id));
+        player.setId(id);
         String sql = "insert into player (" + COLUMNS + ") values (" + questionMarks(COLUMNS) + ")";
         update(sql, player.getId(), player.getName(), player.getType(), player.getUsername(),
                 player.getIpAddress(), player.isAutoControlEnabled(),
@@ -113,9 +113,17 @@ public class PlayerDao extends AbstractDao {
      * @param id The player ID.
      */
     public void deletePlayer(String id) {
-        String sql = "delete from player where id=?";
-        update(sql, id);
-        playlists.remove(id);
+        deletePlayer(Integer.valueOf(id));
+    }
+    /**
+     * Deletes the player with the given ID.
+     *
+     * @param id The player ID.
+     */
+    public void deletePlayer(Integer id) {
+    	String sql = "delete from player where id=?";
+    	update(sql, id);
+    	playlists.remove(id);
     }
 
 
@@ -158,7 +166,7 @@ public class PlayerDao extends AbstractDao {
                 player.getIpAddress(), player.isAutoControlEnabled(),
                 player.getLastSeen(), player.getCoverArtScheme().name(),
                 player.getTranscodeScheme().name(), player.isDynamicIp(),
-                player.getTechnology(), player.getClientId(), player.getId());
+                player.getTechnology().name(), player.getClientId(), player.getId());
     }
 
     private void addPlaylist(Player player) {
@@ -174,7 +182,7 @@ public class PlayerDao extends AbstractDao {
         public Player mapRow(ResultSet rs, int rowNum) throws SQLException {
             Player player = new Player();
             int col = 1;
-            player.setId(rs.getString(col++));
+            player.setId(rs.getInt(col++));
             player.setName(rs.getString(col++));
             player.setType(rs.getString(col++));
             player.setUsername(rs.getString(col++));

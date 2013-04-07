@@ -36,7 +36,8 @@ import java.util.List;
 public class ArtistDao extends AbstractDao {
 
     private static final Logger LOG = Logger.getLogger(ArtistDao.class);
-    private static final String COLUMNS = "id, name, cover_art_path, album_count, last_scanned, present";
+    private static final String COLUMNS_FOR_INSERT = "name, cover_art_path, album_count, last_scanned, present";
+    private static final String COLUMNS = "id, "+COLUMNS_FOR_INSERT;
 
     private final RowMapper rowMapper = new ArtistMapper();
 
@@ -76,8 +77,7 @@ public class ArtistDao extends AbstractDao {
         int n = update(sql, artist.getCoverArtPath(), artist.getAlbumCount(), artist.getLastScanned(), artist.isPresent(), artist.getName());
 
         if (n == 0) {
-
-            update("insert into artist (" + COLUMNS + ") values (" + questionMarks(COLUMNS) + ")", null,
+            update("insert into artist (" + COLUMNS_FOR_INSERT + ") values (" + questionMarks(COLUMNS_FOR_INSERT) + ")", 
                     artist.getName(), artist.getCoverArtPath(), artist.getAlbumCount(), artist.getLastScanned(), artist.isPresent());
         }
 

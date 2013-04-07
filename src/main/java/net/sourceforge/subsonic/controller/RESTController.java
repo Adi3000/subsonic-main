@@ -1578,13 +1578,13 @@ public class RESTController extends MultiActionController {
     }
 
     private HttpServletRequest wrapRequest(final HttpServletRequest request, boolean jukebox) {
-        final String playerId = createPlayerIfNecessary(request, jukebox);
+        final Integer playerId = createPlayerIfNecessary(request, jukebox);
         return new HttpServletRequestWrapper(request) {
             @Override
             public String getParameter(String name) {
                 // Returns the correct player to be used in PlayerService.getPlayer()
                 if ("player".equals(name)) {
-                    return playerId;
+                    return playerId == null ? null : playerId.toString();
                 }
 
                 // Support old style ID parameters.
@@ -1655,7 +1655,7 @@ public class RESTController extends MultiActionController {
         return builder;
     }
 
-    private String createPlayerIfNecessary(HttpServletRequest request, boolean jukebox) {
+    private Integer createPlayerIfNecessary(HttpServletRequest request, boolean jukebox) {
         String username = request.getRemoteUser();
         String clientId = request.getParameter("c");
         if (jukebox) {

@@ -20,13 +20,15 @@ package net.sourceforge.subsonic.domain;
 
 import java.util.Date;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
+
 /**
  * Represents an internet radio station.
  *
  * @author Sindre Mehus
  * @version $Revision: 1.2 $ $Date: 2005/12/25 13:48:46 $
  */
-public class InternetRadio {
+public class InternetRadio extends AbstractDataObject {
 
     private Integer id;
     private String name;

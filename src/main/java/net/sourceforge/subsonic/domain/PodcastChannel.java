@@ -18,6 +18,7 @@
  */
 package net.sourceforge.subsonic.domain;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
 import net.sourceforge.subsonic.util.StringUtil;
 
 /**
@@ -26,7 +27,7 @@ import net.sourceforge.subsonic.util.StringUtil;
  * @author Sindre Mehus
  * @see PodcastEpisode
  */
-public class PodcastChannel {
+public class PodcastChannel  extends AbstractDataObject {
 
     private Integer id;
     private String url;

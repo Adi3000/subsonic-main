@@ -78,7 +78,7 @@ public class PlayerService {
 
         // Find in session context.
         if (player == null && remoteControlEnabled) {
-            String playerId = (String) request.getSession().getAttribute("player");
+            Integer playerId = (Integer) request.getSession().getAttribute("player");
             if (playerId != null) {
                 player = getPlayerById(playerId);
             }
@@ -139,7 +139,7 @@ public class PlayerService {
         // Set cookie in response.
         if (response != null) {
             String cookieName = COOKIE_NAME + "-" + StringUtil.utf8HexEncode(username);
-            Cookie cookie = new Cookie(cookieName, player.getId());
+            Cookie cookie = new Cookie(cookieName, String.valueOf(player.getId()));
             cookie.setMaxAge(COOKIE_EXPIRY);
             String path = request.getContextPath();
             if (StringUtils.isEmpty(path)) {
@@ -172,8 +172,17 @@ public class PlayerService {
      * @param id The unique player ID.
      * @return The player with the given ID, or <code>null</code> if no such player exists.
      */
-    public Player getPlayerById(String id) {
+    public Player getPlayerById(Integer id) {
         return playerDao.getPlayerById(id);
+    }
+    /**
+     * Returns the player with the given ID.
+     *
+     * @param id The unique player ID.
+     * @return The player with the given ID, or <code>null</code> if no such player exists.
+     */
+    public Player getPlayerById(String id) {
+    	return getPlayerById((Integer)(id == null  ? null : Integer.valueOf(id)));
     }
 
     /**

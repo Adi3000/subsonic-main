@@ -36,9 +36,11 @@ import net.sourceforge.subsonic.domain.PodcastStatus;
  */
 public class PodcastDao extends AbstractDao {
 
-    private static final String CHANNEL_COLUMNS = "id, url, title, description, status, error_message";
-    private static final String EPISODE_COLUMNS = "id, channel_id, url, path, title, description, publish_date, " +
+    private static final String CHANNEL_COLUMNS_FOR_INSERT = "url, title, description, status, error_message";
+    private static final String CHANNEL_COLUMNS = "id, "+CHANNEL_COLUMNS_FOR_INSERT;
+    private static final String EPISODE_COLUMNS_FOR_INSERT = "channel_id, url, path, title, description, publish_date, " +
             "duration, bytes_total, bytes_downloaded, status, error_message";
+    private static final String EPISODE_COLUMNS = "id, "+EPISODE_COLUMNS_FOR_INSERT;
 
     private PodcastChannelRowMapper channelRowMapper = new PodcastChannelRowMapper();
     private PodcastEpisodeRowMapper episodeRowMapper = new PodcastEpisodeRowMapper();
@@ -50,8 +52,8 @@ public class PodcastDao extends AbstractDao {
      * @return The ID of the newly created channel.
      */
     public synchronized int createChannel(PodcastChannel channel) {
-        String sql = "insert into podcast_channel (" + CHANNEL_COLUMNS + ") values (" + questionMarks(CHANNEL_COLUMNS) + ")";
-        update(sql, null, channel.getUrl(), channel.getTitle(), channel.getDescription(),
+        String sql = "insert into podcast_channel (" + CHANNEL_COLUMNS_FOR_INSERT + ") values (" + questionMarks(CHANNEL_COLUMNS_FOR_INSERT) + ")";
+        update(sql, channel.getUrl(), channel.getTitle(), channel.getDescription(),
                 channel.getStatus().name(), channel.getErrorMessage());
 
         return getJdbcTemplate().queryForInt("select max(id) from podcast_channel");
@@ -94,8 +96,8 @@ public class PodcastDao extends AbstractDao {
      * @param episode The Podcast episode to create.
      */
     public void createEpisode(PodcastEpisode episode) {
-        String sql = "insert into podcast_episode (" + EPISODE_COLUMNS + ") values (" + questionMarks(EPISODE_COLUMNS) + ")";
-        update(sql, null, episode.getChannelId(), episode.getUrl(), episode.getPath(),
+        String sql = "insert into podcast_episode (" + EPISODE_COLUMNS_FOR_INSERT + ") values (" + questionMarks(EPISODE_COLUMNS_FOR_INSERT) + ")";
+        update(sql, episode.getChannelId(), episode.getUrl(), episode.getPath(),
                 episode.getTitle(), episode.getDescription(), episode.getPublishDate(),
                 episode.getDuration(), episode.getBytesTotal(), episode.getBytesDownloaded(),
                 episode.getStatus().name(), episode.getErrorMessage());

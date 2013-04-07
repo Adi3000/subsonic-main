@@ -18,6 +18,7 @@
  */
 package net.sourceforge.subsonic.domain;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
 import net.sourceforge.subsonic.util.FileUtil;
 import org.apache.commons.io.FilenameUtils;
 
@@ -30,7 +31,7 @@ import java.util.Date;
  * @author Sindre Mehus
  * @version $Id$
  */
-public class MediaFile {
+public class MediaFile extends AbstractDataObject{
 
     private int id;
     private String path;
@@ -100,7 +101,7 @@ public class MediaFile {
     public MediaFile() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

@@ -33,7 +33,8 @@ import net.sourceforge.subsonic.domain.Share;
  */
 public class ShareDao extends AbstractDao {
 
-    private static final String COLUMNS = "id, name, description, username, created, expires, last_visited, visit_count";
+    private static final String COLUMNS_FOR_INSERT = "name, description, username, created, expires, last_visited, visit_count";
+    private static final String COLUMNS = "id, "+COLUMNS_FOR_INSERT;
 
     private ShareRowMapper shareRowMapper = new ShareRowMapper();
     private ShareFileRowMapper shareFileRowMapper = new ShareFileRowMapper();
@@ -44,8 +45,8 @@ public class ShareDao extends AbstractDao {
      * @param share The share to create.  The ID of the share will be set by this method.
      */
     public synchronized void createShare(Share share) {
-        String sql = "insert into share (" + COLUMNS + ") values (" + questionMarks(COLUMNS) + ")";
-        update(sql, null, share.getName(), share.getDescription(), share.getUsername(), share.getCreated(),
+        String sql = "insert into share (" + COLUMNS_FOR_INSERT + ") values (" + questionMarks(COLUMNS_FOR_INSERT) + ")";
+        update(sql,  share.getName(), share.getDescription(), share.getUsername(), share.getCreated(),
                 share.getExpires(), share.getLastVisited(), share.getVisitCount());
 
         int id = getJdbcTemplate().queryForInt("select max(id) from share");

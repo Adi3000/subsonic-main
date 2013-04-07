@@ -40,10 +40,10 @@ import static net.sourceforge.subsonic.domain.MediaFile.MediaType.*;
 public class MediaFileDao extends AbstractDao {
 
     private static final Logger LOG = Logger.getLogger(MediaFileDao.class);
-    private static final String COLUMNS = "id, path, folder, type, format, title, album, artist, disc_number, " +
+    private static final String COLUMNS_FOR_INSERT = "path, folder, type, format, title, album, artist, disc_number, " +
             "track_number, year, genre, bit_rate, variable_bit_rate, duration_seconds, file_size, width, height, cover_art_path, " +
             "parent_path, play_count, last_played, comment, created, last_modified, last_scanned, children_last_updated, present, version";
-
+    private static final String COLUMNS = "id, "+COLUMNS_FOR_INSERT;
     private static final int VERSION = 1;
 
     private final RowMapper rowMapper = new MediaFileMapper();
@@ -140,8 +140,7 @@ public class MediaFileDao extends AbstractDao {
                 file.setLastPlayed(musicFileInfo.getLastPlayed());
                 file.setPlayCount(musicFileInfo.getPlayCount());
             }
-
-            update("insert into media_file (" + COLUMNS + ") values (" + questionMarks(COLUMNS) + ")", null,
+            update("insert into media_file (" + COLUMNS_FOR_INSERT + ") values (" + questionMarks(COLUMNS_FOR_INSERT) + ")", 
                     file.getPath(), file.getFolder(), file.getMediaType().name(), file.getFormat(), file.getTitle(), file.getAlbumName(), file.getArtist(),
                     file.getDiscNumber(), file.getTrackNumber(), file.getYear(), file.getGenre(), file.getBitRate(),
                     file.isVariableBitRate(), file.getDurationSeconds(), file.getFileSize(), file.getWidth(), file.getHeight(),

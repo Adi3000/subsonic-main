@@ -39,8 +39,8 @@ import net.sourceforge.subsonic.util.StringUtil;
 public class UserDao extends AbstractDao {
 
     private static final Logger LOG = Logger.getLogger(UserDao.class);
-    private static final String USER_COLUMNS = "username, password, email, ldap_authenticated, bytes_streamed, bytes_downloaded, bytes_uploaded";
-    private static final String USER_SETTINGS_COLUMNS = "username, locale, theme_id, final_version_notification, beta_version_notification, " +
+    private static final String USERS_COLUMNS = "username, password, email, ldap_authenticated, bytes_streamed, bytes_downloaded, bytes_uploaded";
+    private static final String USERS_SETTINGS_COLUMNS = "username, locale, theme_id, final_version_notification, beta_version_notification, " +
             "main_caption_cutoff, main_track_number, main_artist, main_album, main_genre, " +
             "main_year, main_bit_rate, main_duration, main_format, main_file_size, " +
             "playlist_caption_cutoff, playlist_track_number, playlist_artist, playlist_album, playlist_genre, " +
@@ -70,7 +70,7 @@ public class UserDao extends AbstractDao {
      * @return The user, or <code>null</code> if not found.
      */
     public User getUserByName(String username) {
-        String sql = "select " + USER_COLUMNS + " from user where username=?";
+        String sql = "select " + USERS_COLUMNS + " from users where username=?";
         return queryOne(sql, userRowMapper, username);
     }
 
@@ -81,7 +81,7 @@ public class UserDao extends AbstractDao {
      * @return The user, or <code>null</code> if not found.
      */
     public User getUserByEmail(String email) {
-        String sql = "select " + USER_COLUMNS + " from user where email=?";
+        String sql = "select " + USERS_COLUMNS + " from users where email=?";
         return queryOne(sql, userRowMapper, email);
     }
 
@@ -91,7 +91,7 @@ public class UserDao extends AbstractDao {
      * @return Possibly empty array of all users.
      */
     public List<User> getAllUsers() {
-        String sql = "select " + USER_COLUMNS + " from user";
+        String sql = "select " + USERS_COLUMNS + " from users";
         return query(sql, userRowMapper);
     }
 
@@ -101,7 +101,7 @@ public class UserDao extends AbstractDao {
      * @param user The user to create.
      */
     public void createUser(User user) {
-        String sql = "insert into user (" + USER_COLUMNS + ") values (" + questionMarks(USER_COLUMNS) + ')';
+        String sql = "insert into users (" + USERS_COLUMNS + ") values (" + questionMarks(USERS_COLUMNS) + ')';
         update(sql, user.getUsername(), encrypt(user.getPassword()), user.getEmail(), user.isLdapAuthenticated(),
                 user.getBytesStreamed(), user.getBytesDownloaded(), user.getBytesUploaded());
         writeRoles(user);
@@ -117,10 +117,10 @@ public class UserDao extends AbstractDao {
             throw new IllegalArgumentException("Can't delete admin user.");
         }
 
-        String sql = "delete from user_role where username=?";
+        String sql = "delete from users_role where username=?";
         update(sql, username);
 
-        sql = "delete from user where username=?";
+        sql = "delete from users where username=?";
         update(sql, username);
     }
 
@@ -130,7 +130,7 @@ public class UserDao extends AbstractDao {
      * @param user The user to update.
      */
     public void updateUser(User user) {
-        String sql = "update user set password=?, email=?, ldap_authenticated=?, bytes_streamed=?, bytes_downloaded=?, bytes_uploaded=? " +
+        String sql = "update users set password=?, email=?, ldap_authenticated=?, bytes_streamed=?, bytes_downloaded=?, bytes_uploaded=? " +
                 "where username=?";
         getJdbcTemplate().update(sql, new Object[]{encrypt(user.getPassword()), user.getEmail(), user.isLdapAuthenticated(),
                 user.getBytesStreamed(), user.getBytesDownloaded(), user.getBytesUploaded(),
@@ -145,7 +145,7 @@ public class UserDao extends AbstractDao {
      * @return Roles the user is granted.
      */
     public String[] getRolesForUser(String username) {
-        String sql = "select r.name from role r, user_role ur " +
+        String sql = "select r.name from role r, users_role ur " +
                 "where ur.username=? and ur.role_id=r.id";
         List<?> roles = getJdbcTemplate().queryForList(sql, new Object[]{username}, String.class);
         String[] result = new String[roles.size()];
@@ -162,7 +162,7 @@ public class UserDao extends AbstractDao {
      * @return User-specific settings, or <code>null</code> if no such settings exist.
      */
     public UserSettings getUserSettings(String username) {
-        String sql = "select " + USER_SETTINGS_COLUMNS + " from user_settings where username=?";
+        String sql = "select " + USERS_SETTINGS_COLUMNS + " from users_settings where username=?";
         return queryOne(sql, userSettingsRowMapper, username);
     }
 
@@ -172,9 +172,9 @@ public class UserDao extends AbstractDao {
      * @param settings The user-specific settings.
      */
     public void updateUserSettings(UserSettings settings) {
-        getJdbcTemplate().update("delete from user_settings where username=?", new Object[]{settings.getUsername()});
+        getJdbcTemplate().update("delete from users_settings where username=?", new Object[]{settings.getUsername()});
 
-        String sql = "insert into user_settings (" + USER_SETTINGS_COLUMNS + ") values (" + questionMarks(USER_SETTINGS_COLUMNS) + ')';
+        String sql = "insert into users_settings (" + USERS_SETTINGS_COLUMNS + ") values (" + questionMarks(USERS_SETTINGS_COLUMNS) + ')';
         String locale = settings.getLocale() == null ? null : settings.getLocale().toString();
         UserSettings.Visibility main = settings.getMainVisibility();
         UserSettings.Visibility playlist = settings.getPlaylistVisibility();
@@ -219,7 +219,7 @@ public class UserDao extends AbstractDao {
 
     private void readRoles(User user) {
         synchronized (user.getUsername().intern()) {
-            String sql = "select role_id from user_role where username=?";
+            String sql = "select role_id from users_role where username=?";
             List<?> roles = getJdbcTemplate().queryForList(sql, new Object[]{user.getUsername()}, Integer.class);
             for (Object role : roles) {
                 if (ROLE_ID_ADMIN.equals(role)) {
@@ -253,9 +253,9 @@ public class UserDao extends AbstractDao {
 
     private void writeRoles(User user) {
         synchronized (user.getUsername().intern()) {
-            String sql = "delete from user_role where username=?";
+            String sql = "delete from users_role where username=?";
             getJdbcTemplate().update(sql, new Object[]{user.getUsername()});
-            sql = "insert into user_role (username, role_id) values(?, ?)";
+            sql = "insert into users_role (username, role_id) values(?, ?)";
             if (user.isAdminRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_ADMIN});
             }

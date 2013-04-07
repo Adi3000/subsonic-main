@@ -20,6 +20,7 @@ package net.sourceforge.subsonic.domain;
 
 import java.util.Date;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
 import net.sourceforge.subsonic.util.StringUtil;
 
 /**
@@ -28,7 +29,7 @@ import net.sourceforge.subsonic.util.StringUtil;
  * @author Sindre Mehus
  * @see PodcastChannel
  */
-public class PodcastEpisode {
+public class PodcastEpisode  extends AbstractDataObject {
 
     private Integer id;
     private Integer mediaFileId;

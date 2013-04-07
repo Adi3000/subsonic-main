@@ -2,13 +2,15 @@ package net.sourceforge.subsonic.domain;
 
 import java.util.Date;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
+
 /**
  * A collection of media files that is shared with someone, and accessible via a direct URL.
  *
  * @author Sindre Mehus
  * @version $Id$
  */
-public class Share {
+public class Share extends AbstractDataObject {
 
     private int id;
     private String name;
@@ -34,7 +36,7 @@ public class Share {
         this.visitCount = visitCount;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

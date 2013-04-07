@@ -26,7 +26,16 @@ import org.springframework.jdbc.core.*;
  * @author Sindre Mehus
  */
 public abstract class Schema {
-
+	
+	protected static final int PSQL_DB = 3; 
+	protected static final int HSQL_DB = 0; 
+	private int dbType;
+	
+	public Schema(){
+		//TODO implement that detection
+		this.setDbType(3);
+	}
+	
     /**
      * Executes this schema.
      * @param template The JDBC template to use.
@@ -63,4 +72,13 @@ public abstract class Schema {
         }
         return true;
     }
+
+	public int getDbType() {
+		return dbType;
+	}
+
+	//TODO implement that detection
+	public void setDbType(int dbType) {
+		this.dbType = dbType;
+	}
 }

@@ -40,9 +40,16 @@ import net.sourceforge.subsonic.dao.schema.Schema45;
 import net.sourceforge.subsonic.dao.schema.Schema46;
 import net.sourceforge.subsonic.dao.schema.Schema47;
 import net.sourceforge.subsonic.service.SettingsService;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jndi.JndiObjectFactoryBean;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.File;
 
@@ -94,12 +101,17 @@ public class DaoHelper {
 
     private DataSource createDataSource() {
         File subsonicHome = SettingsService.getSubsonicHome();
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("org.hsqldb.jdbcDriver");
-        ds.setUrl("jdbc:hsqldb:file:" + subsonicHome.getPath() + "/db/subsonic");
-        ds.setUsername("sa");
-        ds.setPassword("");
-
+        Context ctx = null;
+        DataSource ds = null;
+		try {
+			ctx = new InitialContext();
+			ds = (DataSource)ctx.lookup("jdbc/supersonic");
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        DataSourceUtils.getConnection((DataSource)ds);
+        
         return ds;
     }
 

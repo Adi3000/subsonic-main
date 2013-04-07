@@ -20,11 +20,13 @@ package net.sourceforge.subsonic.domain;
 
 import java.util.Date;
 
+import net.sourceforge.subsonic.dao.AbstractDataObject;
+
 /**
  * @author Sindre Mehus
  * @version $Id$
  */
-public class Album {
+public class Album extends AbstractDataObject {
 
     private int id;
     private String name;
@@ -58,7 +60,7 @@ public class Album {
         this.present = present;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
