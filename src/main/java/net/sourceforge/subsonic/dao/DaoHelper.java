@@ -18,6 +18,13 @@
  */
 package net.sourceforge.subsonic.dao;
 
+import java.io.File;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import net.sourceforge.subsonic.Logger;
 import net.sourceforge.subsonic.dao.schema.Schema;
 import net.sourceforge.subsonic.dao.schema.Schema25;
@@ -41,17 +48,9 @@ import net.sourceforge.subsonic.dao.schema.Schema46;
 import net.sourceforge.subsonic.dao.schema.Schema47;
 import net.sourceforge.subsonic.service.SettingsService;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jndi.JndiObjectFactoryBean;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.io.File;
 
 /**
  * DAO helper class which creates the data source, and updates the database schema.
@@ -100,15 +99,27 @@ public class DaoHelper {
     }
 
     private DataSource createDataSource() {
-        File subsonicHome = SettingsService.getSubsonicHome();
+
         Context ctx = null;
         DataSource ds = null;
 		try {
 			ctx = new InitialContext();
 			ds = (DataSource)ctx.lookup("jdbc/supersonic");
+			LOG.info("Found datasource jdbc/supersonic HSQLDB will not be used" );
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.info("No Datasource jdbc/supersonic will use HSQLDB" );
+			ds =null;
+		}
+		
+		//If no jdbc declared
+		if(ds == null){
+			File subsonicHome = SettingsService.getSubsonicHome();
+			DriverManagerDataSource driverManagerDs = new DriverManagerDataSource();
+			driverManagerDs.setDriverClassName("org.hsqldb.jdbcDriver");
+			driverManagerDs.setUrl("jdbc:hsqldb:file:" + subsonicHome.getPath() + "/db/subsonic");
+			driverManagerDs.setUsername("sa");
+			driverManagerDs.setPassword("");
+			ds = driverManagerDs;
 		}
         DataSourceUtils.getConnection((DataSource)ds);
         
