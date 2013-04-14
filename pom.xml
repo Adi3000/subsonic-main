@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.mach5.supersonic</groupId>
-    <artifactId>supersonic-main</artifactId>
+    <groupId>com.github.adi3000.supersonic</groupId>
+    <artifactId>hypersonic-main</artifactId>
     <packaging>war</packaging>
-    <name>Supersonic Main</name>
+    <name>Hypersonic Main</name>
 
     <parent>
         <groupId>com.github.mach5.supersonic</groupId>
@@ -328,7 +328,19 @@
 			<plugin>
                 <groupId>org.codeartisans.asadmin</groupId>
                 <artifactId>asadmin-maven-plugin</artifactId>
-           	</plugin>
+                <version>0.11</version>
+                <configuration>
+                    <glassfishHome>/opt/glassfish3/glassfish</glassfishHome>
+                    <domain>domain1</domain>
+                    <host>localhost</host>
+                    <port>4848</port>
+                    <user>admin</user>
+                    <passwordfile>/opt/glassfish3/.glassfish_password</passwordfile>
+                    <appArchive>${project.build.directory}/${project.build.finalName}.${project.artifact.artifactHandler.extension}</appArchive>
+                    <virtualservers>fafnir</virtualservers>
+                    <appName>supersonic</appName>
+                </configuration>
+			</plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -353,4 +365,17 @@
 
         </plugins>
     </build>
+    <organization>
+    	<url>https://github.com/Adi3000/supersonic-main</url>
+    	<name>Adi3000</name>
+    </organization>
+    <scm>
+    	<url>https://github.com/Adi3000/supersonic.git</url>
+    	<connection>scm:git:https://github.com/Adi3000/supersonic</connection>
+    	<developerConnection>scm:git:git@github.com:Adi3000/supersonic.git</developerConnection>
+    </scm>
+    <ciManagement>
+    	<url>code.adi3000.com/nexus</url>
+    	<system>Nexus</system>
+    </ciManagement>
 </project>
