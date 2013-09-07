@@ -104,7 +104,7 @@ public class DaoHelper {
         DataSource ds = null;
 		try {
 			ctx = new InitialContext();
-			ds = (DataSource)ctx.lookup("jdbc/supersonic");
+			ds = (DataSource)ctx.lookup("java:comp/env/jdbc/supersonic");
 			LOG.info("Found datasource jdbc/supersonic HSQLDB will not be used" );
 		} catch (NamingException e) {
 			LOG.info("No Datasource jdbc/supersonic will use HSQLDB" );
