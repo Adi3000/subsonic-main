@@ -361,21 +361,55 @@
                         </goals>
                     </execution>
                 </executions>
+				<configuration>
+					<target>
+						<!-- calls deploy script -->
+						<sshexec 
+							host="adi3000.com" trust="yes" 
+							username="tomcat-deploy"
+							keyfile="${tomcat.deploy.keyfile}"
+ 							command="sh ${tomcat.deploy.script} ${project.groupId}:${.project.artifactId}:${project.version}" />
+						<!-- SSH -->
+						<taskdef name="sshexec"
+							classname="org.apache.tools.ant.taskdefs.optional.ssh.SSHExec"
+							classpathref="maven.plugin.classpath" />
+					</target>
+				</configuration>
+				<dependencies>
+				    <dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-jsch</artifactId>
+						<version>1.9.2</version>
+					</dependency>
+				</dependencies>
             </plugin>
-
         </plugins>
     </build>
     <organization>
-    	<url>https://github.com/Adi3000/supersonic-main</url>
+    	<url>https://github.com/Adi3000/subsonic-main</url>
     	<name>Adi3000</name>
     </organization>
     <scm>
-    	<url>https://github.com/Adi3000/supersonic.git</url>
-    	<connection>scm:git:https://github.com/Adi3000/supersonic</connection>
-    	<developerConnection>scm:git:git@github.com:Adi3000/supersonic.git</developerConnection>
+    	<url>https://github.com/Adi3000/subsonic-main.git</url>
+    	<connection>scm:git:https://github.com/Adi3000/subsonic-main.git</connection>
+    	<developerConnection>scm:git:https://github.com/Adi3000/subsonic-main.git</developerConnection>
     </scm>
     <ciManagement>
-    	<url>code.adi3000.com/nexus</url>
-    	<system>Nexus</system>
+    	<url>https://adi3000.ci.cloudbees.com/job/hypersonic/</url>
+    	<system>Jenkins</system>
     </ciManagement>
+    <distributionManagement>
+		<!-- use the following if you're not using a snapshot version. -->
+		<repository>
+			<id>release</id>
+			<name>Nexus Snapshot Repository</name>
+			<url>http://code.adi3000.com/nexus/content/repositories/releases</url>
+		</repository>
+		<!-- use the following if you ARE using a snapshot version. -->
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Nexus Snapshot Repository</name>
+			<url>http://code.adi3000.com/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
