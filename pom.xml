@@ -326,7 +326,7 @@
                 </configuration>
 			</plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
 				<configuration>
@@ -342,15 +342,15 @@
 							classname="org.apache.tools.ant.taskdefs.optional.ssh.SSHExec"
 							classpathref="maven.plugin.classpath" />
 					</target>
-					<dependencies>
-					    <dependency>
-							<groupId>org.apache.ant</groupId>
-							<artifactId>ant-jsch</artifactId>
-							<version>1.9.2</version>
-						</dependency>
-					</dependencies>
 				</configuration>
-            </plugin>
+				<dependencies>
+				    <dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-jsch</artifactId>
+						<version>1.9.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
             <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
