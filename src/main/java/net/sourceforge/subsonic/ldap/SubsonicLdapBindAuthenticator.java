@@ -22,6 +22,7 @@ import net.sourceforge.subsonic.Logger;
 import net.sourceforge.subsonic.domain.User;
 import net.sourceforge.subsonic.service.SecurityService;
 import net.sourceforge.subsonic.service.SettingsService;
+
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.ldap.DefaultInitialDirContextFactory;
 import org.acegisecurity.ldap.search.FilterBasedLdapUserSearch;
@@ -32,6 +33,9 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 
 /**
  * LDAP authenticator which uses a delegate {@link BindAuthenticator}, and which
@@ -77,6 +81,20 @@ public class SubsonicLdapBindAuthenticator implements LdapAuthenticator {
                     User newUser = new User(username, "", null, true, 0L, 0L, 0L);
                     newUser.setStreamRole(true);
                     newUser.setSettingsRole(true);
+                    newUser.setPlaylistRole(true);
+                    newUser.setShareRole(false);
+                    newUser.setUploadRole(true);
+                    newUser.setCommentRole(true);
+                    newUser.setPodcastRole(false);
+                    newUser.setCoverArtRole(true);
+                    Attribute mailAttribute = details.getAttributes().get("mail");
+                    if(mailAttribute != null){
+                    	try {
+							newUser.setEmail((String)mailAttribute.get());
+						} catch (NamingException e) {
+							LOG.warn("Can't retrieve mail for "+ username, e);
+						}
+                    }
                     securityService.createUser(newUser);
                     LOG.info("Created local user '" + username + "' for DN " + details.getDn());
                 }
