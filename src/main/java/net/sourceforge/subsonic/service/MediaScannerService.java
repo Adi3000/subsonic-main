@@ -210,6 +210,7 @@ public class MediaScannerService {
 
         mediaFileDao.markPresent(file.getPath(), lastScanned);
         artistDao.markPresent(file.getArtist(), lastScanned);
+        albumDao.markPresent(file.getAlbumName(), file.getArtist(), lastScanned);
     }
 
     private void updateAlbum(MediaFile file, Date lastScanned, Map<String, Integer> albumCount) {

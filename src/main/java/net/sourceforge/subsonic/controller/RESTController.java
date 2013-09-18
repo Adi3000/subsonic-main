@@ -1455,13 +1455,13 @@ public class RESTController extends MultiActionController {
             command.setEmail(ServletRequestUtils.getRequiredStringParameter(request, "email"));
             command.setLdapAuthenticated(ServletRequestUtils.getBooleanParameter(request, "ldapAuthenticated", false));
             command.setAdminRole(ServletRequestUtils.getBooleanParameter(request, "adminRole", false));
-            command.setCommentRole(ServletRequestUtils.getBooleanParameter(request, "commentRole", false));
-            command.setCoverArtRole(ServletRequestUtils.getBooleanParameter(request, "coverArtRole", false));
-            command.setDownloadRole(ServletRequestUtils.getBooleanParameter(request, "downloadRole", false));
+            command.setCommentRole(ServletRequestUtils.getBooleanParameter(request, "commentRole", true));
+            command.setCoverArtRole(ServletRequestUtils.getBooleanParameter(request, "coverArtRole", true));
+            command.setDownloadRole(ServletRequestUtils.getBooleanParameter(request, "downloadRole", true));
             command.setStreamRole(ServletRequestUtils.getBooleanParameter(request, "streamRole", true));
-            command.setUploadRole(ServletRequestUtils.getBooleanParameter(request, "uploadRole", false));
+            command.setUploadRole(ServletRequestUtils.getBooleanParameter(request, "uploadRole", true));
             command.setJukeboxRole(ServletRequestUtils.getBooleanParameter(request, "jukeboxRole", false));
-            command.setPlaylistRole(ServletRequestUtils.getBooleanParameter(request, "playlistRole", false));
+            command.setPlaylistRole(ServletRequestUtils.getBooleanParameter(request, "playlistRole", true));
             command.setPodcastRole(ServletRequestUtils.getBooleanParameter(request, "podcastRole", false));
             command.setSettingsRole(ServletRequestUtils.getBooleanParameter(request, "settingsRole", true));
             command.setTranscodeSchemeName(ServletRequestUtils.getStringParameter(request, "transcodeScheme", TranscodeScheme.OFF.name()));

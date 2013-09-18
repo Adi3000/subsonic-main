@@ -152,6 +152,10 @@ public class AlbumDao extends AbstractDao {
                 "album.present and starred_album.username=? order by starred_album.created desc limit ? offset ?",
                 rowMapper, username, count, offset);
     }
+    
+    public void markPresent(String albumName, String artistName, Date lastScanned) {
+        update("update album set present=?, last_scanned=? where name=? and artist=?", true, lastScanned, albumName, artistName);
+    }
 
     public void markNonPresent(Date lastScanned) {
         int minId = queryForInt("select id from album where true limit 1", 0);
