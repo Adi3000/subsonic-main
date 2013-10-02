@@ -87,6 +87,7 @@ public class SubsonicLdapBindAuthenticator implements LdapAuthenticator {
                     newUser.setCommentRole(true);
                     newUser.setPodcastRole(false);
                     newUser.setCoverArtRole(true);
+                    newUser.setDownloadRole(true);
                     Attribute mailAttribute = details.getAttributes().get("mail");
                     if(mailAttribute != null){
                     	try {
