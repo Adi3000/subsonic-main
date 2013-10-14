@@ -347,7 +347,7 @@ public class RESTController extends MultiActionController {
             int id = ServletRequestUtils.getRequiredIntParameter(request, "id");
             song = mediaFileDao.getMediaFile(id);
             if (song == null || song.isDirectory()) {
-                throw new Exception();
+                throw new Exception("Can't get song with ID "+ id + "["+song+"]");
             }
         } catch (Exception x) {
             LOG.warn("Error in REST API.", x);
