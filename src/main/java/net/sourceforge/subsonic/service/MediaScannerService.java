@@ -207,7 +207,7 @@ public class MediaScannerService {
             updateAlbum(file, lastScanned, albumCount);
             updateArtist(file, lastScanned, albumCount);
         }
-        LOG.info("Found : " + file.getPath() + " : " + file.getArtist() + " / " + file.getAlbumName());
+        LOG.debug("Found : " + file.getPath() + " : " + file.getArtist() + " / " + file.getAlbumName());
         mediaFileDao.markPresent(file.getPath(), lastScanned);
         artistDao.markPresent(file.getArtist(), lastScanned);
         albumDao.markPresent(file.getAlbumName(), file.getArtist(), lastScanned);
