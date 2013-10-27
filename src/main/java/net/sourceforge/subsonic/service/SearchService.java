@@ -18,6 +18,20 @@
  */
 package net.sourceforge.subsonic.service;
 
+import static net.sourceforge.subsonic.service.SearchService.IndexType.ALBUM;
+import static net.sourceforge.subsonic.service.SearchService.IndexType.ALBUM_ID3;
+import static net.sourceforge.subsonic.service.SearchService.IndexType.ARTIST;
+import static net.sourceforge.subsonic.service.SearchService.IndexType.ARTIST_ID3;
+import static net.sourceforge.subsonic.service.SearchService.IndexType.SONG;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import net.sourceforge.subsonic.Logger;
 import net.sourceforge.subsonic.dao.AlbumDao;
 import net.sourceforge.subsonic.dao.ArtistDao;
@@ -29,45 +43,31 @@ import net.sourceforge.subsonic.domain.RandomSearchCriteria;
 import net.sourceforge.subsonic.domain.SearchCriteria;
 import net.sourceforge.subsonic.domain.SearchResult;
 import net.sourceforge.subsonic.util.FileUtil;
-import org.apache.lucene.analysis.ASCIIFoldingFilter;
+
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.miscellaneous.LimitTokenCountAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.standard.StandardFilter;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.NumericField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import static net.sourceforge.subsonic.service.SearchService.IndexType.*;
-import static net.sourceforge.subsonic.service.SearchService.IndexType.SONG;
 
 /**
  * Performs Lucene-based searching and indexing.
@@ -78,7 +78,7 @@ import static net.sourceforge.subsonic.service.SearchService.IndexType.SONG;
  */
 public class SearchService {
 
-    private static final Logger LOG = Logger.getLogger(SearchService.class);
+	private static final Logger LOG = Logger.getLogger(SearchService.class);
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_TITLE = "title";
@@ -89,7 +89,7 @@ public class SearchService {
     private static final String FIELD_MEDIA_TYPE = "mediaType";
     private static final String FIELD_FOLDER = "folder";
 
-    private static final Version LUCENE_VERSION = Version.LUCENE_30;
+    private static final Version LUCENE_VERSION = Version.LUCENE_45;
 
     private MediaFileService mediaFileService;
     private SettingsService settingsService;
@@ -150,21 +150,11 @@ public class SearchService {
     }
 
     public void stopIndexing() {
-        try {
-            artistWriter.optimize();
-            artistId3Writer.optimize();
-            albumWriter.optimize();
-            albumId3Writer.optimize();
-            songWriter.optimize();
-        } catch (Exception x) {
-            LOG.error("Failed to create search index.", x);
-        } finally {
-            FileUtil.closeQuietly(artistId3Writer);
-            FileUtil.closeQuietly(artistWriter);
-            FileUtil.closeQuietly(albumWriter);
-            FileUtil.closeQuietly(albumId3Writer);
-            FileUtil.closeQuietly(songWriter);
-        }
+        FileUtil.closeQuietly(artistId3Writer);
+        FileUtil.closeQuietly(artistWriter);
+        FileUtil.closeQuietly(albumWriter);
+        FileUtil.closeQuietly(albumId3Writer);
+        FileUtil.closeQuietly(songWriter);
     }
 
     public SearchResult search(SearchCriteria criteria, IndexType indexType) {
@@ -176,8 +166,8 @@ public class SearchService {
         IndexReader reader = null;
         try {
             reader = createIndexReader(indexType);
-            Searcher searcher = new IndexSearcher(reader);
-            Analyzer analyzer = new SubsonicAnalyzer();
+            IndexSearcher searcher = new IndexSearcher(reader);
+            Analyzer analyzer = new StandardAnalyzer(LUCENE_VERSION);
 
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(LUCENE_VERSION, indexType.getFields(), analyzer, indexType.getBoosts());
             Query query = queryParser.parse(criteria.getQuery());
@@ -235,7 +225,7 @@ public class SearchService {
         IndexReader reader = null;
         try {
             reader = createIndexReader(SONG);
-            Searcher searcher = new IndexSearcher(reader);
+            IndexSearcher searcher = new IndexSearcher(reader);
 
             BooleanQuery query = new BooleanQuery();
             query.add(new TermQuery(new Term(FIELD_MEDIA_TYPE, MediaFile.MediaType.MUSIC.name().toLowerCase())), BooleanClause.Occur.MUST);
@@ -284,7 +274,7 @@ public class SearchService {
         IndexReader reader = null;
         try {
             reader = createIndexReader(ALBUM);
-            Searcher searcher = new IndexSearcher(reader);
+            IndexSearcher searcher = new IndexSearcher(reader);
 
             Query query = new MatchAllDocsQuery();
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
@@ -321,7 +311,7 @@ public class SearchService {
         IndexReader reader = null;
         try {
             reader = createIndexReader(ALBUM_ID3);
-            Searcher searcher = new IndexSearcher(reader);
+            IndexSearcher searcher = new IndexSearcher(reader);
 
             Query query = new MatchAllDocsQuery();
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
@@ -353,12 +343,16 @@ public class SearchService {
     }
     private IndexWriter createIndexWriter(IndexType indexType) throws IOException {
         File dir = getIndexDirectory(indexType);
-        return new IndexWriter(FSDirectory.open(dir), new SubsonicAnalyzer(), true, new IndexWriter.MaxFieldLength(10));
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(LUCENE_VERSION, new LimitTokenCountAnalyzer(new StandardAnalyzer(LUCENE_VERSION), 10));
+        indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+        IndexWriter indexWriter = new IndexWriter(FSDirectory.open(dir), indexWriterConfig);
+        return indexWriter;
     }
 
     private IndexReader createIndexReader(IndexType indexType) throws IOException {
         File dir = getIndexDirectory(indexType);
-        return IndexReader.open(FSDirectory.open(dir), true);
+        
+        return DirectoryReader.open(FSDirectory.open(dir));
     }
 
     private File getIndexRootDirectory() {
@@ -408,23 +402,23 @@ public class SearchService {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
-                doc.add(new NumericField(FIELD_ID, Field.Store.YES, false).setIntValue(mediaFile.getId()));
-                doc.add(new Field(FIELD_MEDIA_TYPE, mediaFile.getMediaType().name(), Field.Store.NO, Field.Index.ANALYZED_NO_NORMS));
+                doc.add(new IntField(FIELD_ID, mediaFile.getId(), Field.Store.YES));
+                doc.add(new StringField(FIELD_MEDIA_TYPE, mediaFile.getMediaType().name(), Field.Store.NO));
 
                 if (mediaFile.getTitle() != null) {
-                    doc.add(new Field(FIELD_TITLE, mediaFile.getTitle(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_TITLE, mediaFile.getTitle(), Field.Store.YES));
                 }
                 if (mediaFile.getArtist() != null) {
-                    doc.add(new Field(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES));
                 }
                 if (mediaFile.getGenre() != null) {
-                    doc.add(new Field(FIELD_GENRE, mediaFile.getGenre(), Field.Store.NO, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_GENRE, mediaFile.getGenre(), Field.Store.NO));
                 }
                 if (mediaFile.getYear() != null) {
-                    doc.add(new NumericField(FIELD_YEAR, Field.Store.NO, true).setIntValue(mediaFile.getYear()));
+                    doc.add(new IntField(FIELD_YEAR, mediaFile.getYear(), Field.Store.NO));
                 }
                 if (mediaFile.getFolder() != null) {
-                    doc.add(new Field(FIELD_FOLDER, mediaFile.getFolder(), Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
+                    doc.add(new StringField(FIELD_FOLDER, mediaFile.getFolder(), Field.Store.NO));
                 }
 
                 return doc;
@@ -435,13 +429,13 @@ public class SearchService {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
-                doc.add(new NumericField(FIELD_ID, Field.Store.YES, false).setIntValue(mediaFile.getId()));
+                doc.add(new IntField(FIELD_ID,mediaFile.getId(), Field.Store.YES));
 
                 if (mediaFile.getArtist() != null) {
-                    doc.add(new Field(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES));
                 }
                 if (mediaFile.getAlbumName() != null) {
-                    doc.add(new Field(FIELD_ALBUM, mediaFile.getAlbumName(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_ALBUM, mediaFile.getAlbumName(), Field.Store.YES));
                 }
 
                 return doc;
@@ -452,13 +446,13 @@ public class SearchService {
             @Override
             public Document createDocument(Album album) {
                 Document doc = new Document();
-                doc.add(new NumericField(FIELD_ID, Field.Store.YES, false).setIntValue(album.getId()));
+                doc.add(new IntField(FIELD_ID, album.getId(),Field.Store.YES));
 
                 if (album.getArtist() != null) {
-                    doc.add(new Field(FIELD_ARTIST, album.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_ARTIST, album.getArtist(), Field.Store.YES));
                 }
                 if (album.getName() != null) {
-                    doc.add(new Field(FIELD_ALBUM, album.getName(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_ALBUM, album.getName(), Field.Store.YES));
                 }
 
                 return doc;
@@ -469,10 +463,10 @@ public class SearchService {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
-                doc.add(new NumericField(FIELD_ID, Field.Store.YES, false).setIntValue(mediaFile.getId()));
+                doc.add(new IntField(FIELD_ID, mediaFile.getId(), Field.Store.YES));
 
                 if (mediaFile.getArtist() != null) {
-                    doc.add(new Field(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new StringField(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES));
                 }
 
                 return doc;
@@ -483,8 +477,8 @@ public class SearchService {
             @Override
             public Document createDocument(Artist artist) {
                 Document doc = new Document();
-                doc.add(new NumericField(FIELD_ID, Field.Store.YES, false).setIntValue(artist.getId()));
-                doc.add(new Field(FIELD_ARTIST, artist.getName(), Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new IntField(FIELD_ID, artist.getId(), Field.Store.YES));
+                doc.add(new StringField(FIELD_ARTIST, artist.getName(), Field.Store.YES));
 
                 return doc;
             }
@@ -522,41 +516,6 @@ public class SearchService {
         }
     }
 
-    private class SubsonicAnalyzer extends StandardAnalyzer {
-        private SubsonicAnalyzer() {
-            super(LUCENE_VERSION);
-        }
-
-        @Override
-        public TokenStream tokenStream(String fieldName, Reader reader) {
-            TokenStream result = super.tokenStream(fieldName, reader);
-            return new ASCIIFoldingFilter(result);
-        }
-
-        @Override
-        public TokenStream reusableTokenStream(String fieldName, Reader reader) throws IOException {
-            class SavedStreams {
-                StandardTokenizer tokenStream;
-                TokenStream filteredTokenStream;
-            }
-
-            SavedStreams streams = (SavedStreams) getPreviousTokenStream();
-            if (streams == null) {
-                streams = new SavedStreams();
-                setPreviousTokenStream(streams);
-                streams.tokenStream = new StandardTokenizer(LUCENE_VERSION, reader);
-                streams.filteredTokenStream = new StandardFilter(streams.tokenStream);
-                streams.filteredTokenStream = new LowerCaseFilter(streams.filteredTokenStream);
-                streams.filteredTokenStream = new StopFilter(true, streams.filteredTokenStream, STOP_WORDS_SET);
-                streams.filteredTokenStream = new ASCIIFoldingFilter(streams.filteredTokenStream);
-            } else {
-                streams.tokenStream.reset(reader);
-            }
-            streams.tokenStream.setMaxTokenLength(DEFAULT_MAX_TOKEN_LENGTH);
-
-            return streams.filteredTokenStream;
-        }
-    }
 }
 
 
