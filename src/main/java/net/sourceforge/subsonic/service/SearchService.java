@@ -177,6 +177,7 @@ public class SearchService {
 
             int start = Math.min(offset, topDocs.totalHits);
             int end = Math.min(start + count, topDocs.totalHits);
+            LOG.debug("Index ["+indexType.name()+"] retrieve" +  topDocs.totalHits + " songs with query : " + query);
             for (int i = start; i < end; i++) {
                 Document doc = searcher.doc(topDocs.scoreDocs[i].doc);
                 switch (indexType) {
@@ -242,7 +243,7 @@ public class SearchService {
 
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
-
+            LOG.debug("Index retrieve" +  topDocs.totalHits + " songs with query : " + query);
             for (int i = 0; i < Math.min(criteria.getCount(), topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
@@ -280,6 +281,7 @@ public class SearchService {
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
 
+            LOG.debug("Index retrieve" +  topDocs.totalHits + " albums with query : " + query);
             for (int i = 0; i < Math.min(count, topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
@@ -317,6 +319,7 @@ public class SearchService {
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
 
+            LOG.debug("Index retrieve" +  topDocs.totalHits + " albumsId3 with query : " + query);
             for (int i = 0; i < Math.min(count, topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
