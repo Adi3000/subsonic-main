@@ -50,7 +50,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -177,7 +176,7 @@ public class SearchService {
 
             int start = Math.min(offset, topDocs.totalHits);
             int end = Math.min(start + count, topDocs.totalHits);
-            LOG.debug("Index ["+indexType.name()+"] retrieve" +  topDocs.totalHits + " songs with query : " + query);
+            LOG.debug("Index ["+indexType.name()+"] retrieve " +  topDocs.totalHits + " songs with query : " + query);
             for (int i = start; i < end; i++) {
                 Document doc = searcher.doc(topDocs.scoreDocs[i].doc);
                 switch (indexType) {
@@ -243,7 +242,7 @@ public class SearchService {
 
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
-            LOG.debug("Index retrieve" +  topDocs.totalHits + " songs with query : " + query);
+            LOG.debug("Index retrieve " +  topDocs.totalHits + " songs with query : " + query);
             for (int i = 0; i < Math.min(criteria.getCount(), topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
@@ -281,7 +280,7 @@ public class SearchService {
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
 
-            LOG.debug("Index retrieve" +  topDocs.totalHits + " albums with query : " + query);
+            LOG.debug("Index retrieve " +  topDocs.totalHits + " albums with query : " + query);
             for (int i = 0; i < Math.min(count, topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
@@ -319,7 +318,7 @@ public class SearchService {
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
 
-            LOG.debug("Index retrieve" +  topDocs.totalHits + " albumsId3 with query : " + query);
+            LOG.debug("Index retrieve " +  topDocs.totalHits + " albumsId3 with query : " + query);
             for (int i = 0; i < Math.min(count, topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
@@ -401,44 +400,44 @@ public class SearchService {
 
     public static enum IndexType {
 
-        SONG(new String[]{FIELD_TITLE, FIELD_ARTIST}, FIELD_TITLE) {
+        SONG(new String[]{FIELD_TITLE}, FIELD_TITLE) {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
                 doc.add(new IntField(FIELD_ID, mediaFile.getId(), Field.Store.YES));
-                doc.add(new StringField(FIELD_MEDIA_TYPE, mediaFile.getMediaType().name(), Field.Store.NO));
+                doc.add(new Field(FIELD_MEDIA_TYPE, mediaFile.getMediaType().name(), Field.Store.NO, Field.Index.ANALYZED_NO_NORMS));
 
                 if (mediaFile.getTitle() != null) {
-                    doc.add(new StringField(FIELD_TITLE, mediaFile.getTitle(), Field.Store.YES));
+                    doc.add(new Field(FIELD_TITLE, mediaFile.getTitle(), Field.Store.YES, Field.Index.ANALYZED));
                 }
                 if (mediaFile.getArtist() != null) {
-                    doc.add(new StringField(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES));
+                    doc.add(new Field(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
                 }
                 if (mediaFile.getGenre() != null) {
-                    doc.add(new StringField(FIELD_GENRE, mediaFile.getGenre(), Field.Store.NO));
+                    doc.add(new Field(FIELD_GENRE, mediaFile.getGenre(), Field.Store.NO, Field.Index.ANALYZED));
                 }
                 if (mediaFile.getYear() != null) {
                     doc.add(new IntField(FIELD_YEAR, mediaFile.getYear(), Field.Store.NO));
                 }
                 if (mediaFile.getFolder() != null) {
-                    doc.add(new StringField(FIELD_FOLDER, mediaFile.getFolder(), Field.Store.NO));
+                    doc.add(new Field(FIELD_FOLDER, mediaFile.getFolder(), Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
                 }
 
                 return doc;
             }
         },
 
-        ALBUM(new String[]{FIELD_ALBUM, FIELD_ARTIST}, FIELD_ALBUM) {
+        ALBUM(new String[]{FIELD_ALBUM}, FIELD_ALBUM) {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
                 doc.add(new IntField(FIELD_ID,mediaFile.getId(), Field.Store.YES));
 
                 if (mediaFile.getArtist() != null) {
-                    doc.add(new StringField(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES));
+                    doc.add(new Field(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
                 }
                 if (mediaFile.getAlbumName() != null) {
-                    doc.add(new StringField(FIELD_ALBUM, mediaFile.getAlbumName(), Field.Store.YES));
+                    doc.add(new Field(FIELD_ALBUM, mediaFile.getAlbumName(), Field.Store.YES, Field.Index.ANALYZED));
                 }
 
                 return doc;
@@ -452,10 +451,10 @@ public class SearchService {
                 doc.add(new IntField(FIELD_ID, album.getId(),Field.Store.YES));
 
                 if (album.getArtist() != null) {
-                    doc.add(new StringField(FIELD_ARTIST, album.getArtist(), Field.Store.YES));
+                    doc.add(new Field(FIELD_ARTIST, album.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
                 }
                 if (album.getName() != null) {
-                    doc.add(new StringField(FIELD_ALBUM, album.getName(), Field.Store.YES));
+                    doc.add(new Field(FIELD_ALBUM, album.getName(), Field.Store.YES, Field.Index.ANALYZED));
                 }
 
                 return doc;
@@ -469,7 +468,7 @@ public class SearchService {
                 doc.add(new IntField(FIELD_ID, mediaFile.getId(), Field.Store.YES));
 
                 if (mediaFile.getArtist() != null) {
-                    doc.add(new StringField(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES));
+                    doc.add(new Field(FIELD_ARTIST, mediaFile.getArtist(), Field.Store.YES, Field.Index.ANALYZED));
                 }
 
                 return doc;
@@ -481,7 +480,7 @@ public class SearchService {
             public Document createDocument(Artist artist) {
                 Document doc = new Document();
                 doc.add(new IntField(FIELD_ID, artist.getId(), Field.Store.YES));
-                doc.add(new StringField(FIELD_ARTIST, artist.getName(), Field.Store.YES));
+                doc.add(new Field(FIELD_ARTIST, artist.getName(), Field.Store.YES, Field.Index.ANALYZED));
 
                 return doc;
             }
