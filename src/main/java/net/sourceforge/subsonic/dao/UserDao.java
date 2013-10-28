@@ -258,47 +258,47 @@ public class UserDao extends AbstractDao {
             sql = "insert into users_role (username, role_id) values(?, ?)";
             if (user.isAdminRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_ADMIN});
-                LOG.info(user.getUsername().concat(" granted to role Admin"));
+                LOG.debug(user.getUsername().concat(" granted to role Admin"));
             }
             if (user.isDownloadRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_DOWNLOAD});
-                LOG.info(user.getUsername().concat(" granted to role Download"));
+                LOG.debug(user.getUsername().concat(" granted to role Download"));
             }
             if (user.isUploadRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_UPLOAD});
-                LOG.info(user.getUsername().concat(" granted to role Upload"));
+                LOG.debug(user.getUsername().concat(" granted to role Upload"));
             }
             if (user.isPlaylistRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_PLAYLIST});
-                LOG.info(user.getUsername().concat(" granted to role Playlist"));
+                LOG.debug(user.getUsername().concat(" granted to role Playlist"));
             }
             if (user.isCoverArtRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_COVER_ART});
-                LOG.info(user.getUsername().concat(" granted to role Art"));
+                LOG.debug(user.getUsername().concat(" granted to role Art"));
             }
             if (user.isCommentRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_COMMENT});
-                LOG.info(user.getUsername().concat(" granted to role Comment"));
+                LOG.debug(user.getUsername().concat(" granted to role Comment"));
             }
             if (user.isPodcastRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_PODCAST});
-                LOG.info(user.getUsername().concat(" granted to role Podcast"));
+                LOG.debug(user.getUsername().concat(" granted to role Podcast"));
             }
             if (user.isStreamRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_STREAM});
-                LOG.info(user.getUsername().concat(" granted to role Stream"));
+                LOG.debug(user.getUsername().concat(" granted to role Stream"));
             }
             if (user.isJukeboxRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_JUKEBOX});
-                LOG.info(user.getUsername().concat(" granted to role Jukebox"));
+                LOG.debug(user.getUsername().concat(" granted to role Jukebox"));
             }
             if (user.isSettingsRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_SETTINGS});
-                LOG.info(user.getUsername().concat(" granted to role Setting"));
+                LOG.debug(user.getUsername().concat(" granted to role Setting"));
             }
             if (user.isShareRole()) {
                 getJdbcTemplate().update(sql, new Object[]{user.getUsername(), ROLE_ID_SHARE});
-                LOG.info(user.getUsername().concat(" granted to role Share"));
+                LOG.debug(user.getUsername().concat(" granted to role Share"));
             }
         }
     }
