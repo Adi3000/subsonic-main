@@ -400,7 +400,7 @@ public class SearchService {
 
     public static enum IndexType {
 
-        SONG(new String[]{FIELD_TITLE}, FIELD_TITLE) {
+        SONG(new String[]{FIELD_TITLE, FIELD_ARTIST}, FIELD_TITLE) {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
@@ -427,7 +427,7 @@ public class SearchService {
             }
         },
 
-        ALBUM(new String[]{FIELD_ALBUM}, FIELD_ALBUM) {
+        ALBUM(new String[]{FIELD_ALBUM, FIELD_ARTIST}, FIELD_ALBUM) {
             @Override
             public Document createDocument(MediaFile mediaFile) {
                 Document doc = new Document();
