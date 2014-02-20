@@ -242,7 +242,7 @@ public class SearchService {
 
             TopDocs topDocs = searcher.search(query, null, Integer.MAX_VALUE);
             Random random = new Random(System.currentTimeMillis());
-            LOG.debug("Index retrieve " +  topDocs.totalHits + " songs with query : " + query);
+            LOG.info("Index retrieve random song : " +  topDocs.totalHits + " songs with query : " + query);
             for (int i = 0; i < Math.min(criteria.getCount(), topDocs.totalHits); i++) {
                 int index = random.nextInt(topDocs.totalHits);
                 Document doc = searcher.doc(topDocs.scoreDocs[index].doc);
